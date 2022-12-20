@@ -1,5 +1,6 @@
 package by.markov.checkrunnerspringboot.services.payment;
 
+import by.markov.checkrunnerspringboot.aop.CheckInLog;
 import by.markov.checkrunnerspringboot.entities.Check;
 import by.markov.checkrunnerspringboot.entities.Order;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ public class CheckManager {
 
     private final CheckPrinter checkPrinter;
 
+    @CheckInLog
     public Check createAndPrintCheck(Order order) {
         Check check = Check.builder()
                 .order(order)
