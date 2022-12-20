@@ -20,7 +20,8 @@ public class CommandLineArgumentsParser {
 
     public void start(String[] args) {
         if (checkInputFormat(args)) {
-            parseCommandLineArgumentsAndDelegateCreateOrder(args);
+            DiscountCard discountCard = parseCommandLineArgumentsAndDelegateCreateOrder(args);
+            orderManager.createOrderAndDelegateCreateCheck(productIds, productAmount, discountCard);
         }
     }
 
@@ -37,19 +38,19 @@ public class CommandLineArgumentsParser {
         return true;
     }
 
-    public void parseCommandLineArgumentsAndDelegateCreateOrder(String[] args) {
-        DiscountCard discountCard;
+    public DiscountCard parseCommandLineArgumentsAndDelegateCreateOrder(String[] args) {
+        long cardNumber = 0;
         for (String str : args) {
             String[] productAndAmount = str.split("-");
             if (productAndAmount[0].equalsIgnoreCase("card")) {
-                 discountCard = DiscountCard.builder()
-                        .number(Long.parseLong(productAndAmount[1]))
-                        .build();
-                orderManager.createOrderAndDelegateCreateCheck(productIds, productAmount, discountCard);
+                cardNumber = Long.parseLong(productAndAmount[1]);
             } else {
                 productIds.add(Long.parseLong(productAndAmount[0]));
                 productAmount.add(Integer.parseInt(productAndAmount[1]));
             }
         }
+        return DiscountCard.builder()
+                .number(cardNumber)
+                .build();
     }
 }

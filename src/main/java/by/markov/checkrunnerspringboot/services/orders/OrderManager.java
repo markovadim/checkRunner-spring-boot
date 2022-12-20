@@ -1,6 +1,5 @@
 package by.markov.checkrunnerspringboot.services.orders;
 
-import by.markov.checkrunnerspringboot.dto.ProductDto;
 import by.markov.checkrunnerspringboot.entities.Check;
 import by.markov.checkrunnerspringboot.entities.DiscountCard;
 import by.markov.checkrunnerspringboot.entities.Order;
@@ -9,7 +8,6 @@ import by.markov.checkrunnerspringboot.services.discountcards.DiscountCardServic
 import by.markov.checkrunnerspringboot.services.payment.CheckManager;
 import by.markov.checkrunnerspringboot.services.products.ProductService;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

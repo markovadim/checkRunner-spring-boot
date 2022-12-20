@@ -2,11 +2,8 @@ package by.markov.checkrunnerspringboot.controllers;
 
 
 import by.markov.checkrunnerspringboot.entities.Check;
-import by.markov.checkrunnerspringboot.entities.Product;
-import by.markov.checkrunnerspringboot.exceptions.DiscountCardNotFound;
 import by.markov.checkrunnerspringboot.services.discountcards.DiscountCardService;
 import by.markov.checkrunnerspringboot.services.orders.OrderManager;
-import by.markov.checkrunnerspringboot.services.products.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,5 +30,4 @@ public class ShopManagerController {
                 discountCardService.findByNumber(card))
         );
     }
-
 }

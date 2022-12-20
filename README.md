@@ -7,7 +7,7 @@ _______
 -gradle 7.5  
 -Spring Boot 3.0.0  
 -Spring Data JPA  
--Spring Web
+-Spring Web  
 -PostgreSQL database  
 -Lombok</sub>
 -------
