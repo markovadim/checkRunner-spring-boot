@@ -20,9 +20,10 @@ _______
     [GET] http://localhost:8080/products
 
 #### Get check by request params:
-    [GET] http://localhost:8080/check?id={id}&amount={amount}&card={card number}
+    [GET] http://localhost:8080/check?args={id-item}&args={id-item}&args={card-1234}
 -------
-![image](https://user-images.githubusercontent.com/86801437/208313537-2eb0b5e3-1720-4b12-b0ae-90c9bed978aa.png)
+
+[comment]: <> (![image]&#40;https://user-images.githubusercontent.com/86801437/208313537-2eb0b5e3-1720-4b12-b0ae-90c9bed978aa.png&#41;)
 
 #### Docker image:
     docker pull 200605030904/checkrunner

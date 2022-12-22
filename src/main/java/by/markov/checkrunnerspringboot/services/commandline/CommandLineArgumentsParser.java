@@ -1,11 +1,9 @@
 package by.markov.checkrunnerspringboot.services.commandline;
 
-import by.markov.checkrunnerspringboot.entities.DiscountCard;
-import by.markov.checkrunnerspringboot.services.orders.OrderManager;
+import by.markov.checkrunnerspringboot.entities.ProductInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,16 +11,14 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class CommandLineArgumentsParser {
 
-    private final OrderManager orderManager;
-    private final List<Long> productIds;
-    private final List<Integer> productAmount;
+    private final ProductInfo productInfo;
 
 
-    public void start(String[] args) {
+    public ProductInfo parseData(String[] args) {
         if (checkInputFormat(args)) {
-            DiscountCard discountCard = parseCommandLineArgumentsAndDelegateCreateOrder(args);
-            orderManager.createOrderAndDelegateCreateCheck(productIds, productAmount, discountCard);
+            parseCommandLineArgumentsAndDelegateCreateOrder(args);
         }
+        return productInfo;
     }
 
     public boolean checkInputFormat(String[] args) {
@@ -38,19 +34,16 @@ public class CommandLineArgumentsParser {
         return true;
     }
 
-    public DiscountCard parseCommandLineArgumentsAndDelegateCreateOrder(String[] args) {
-        long cardNumber = 0;
+    public void parseCommandLineArgumentsAndDelegateCreateOrder(String[] args) {
         for (String str : args) {
             String[] productAndAmount = str.split("-");
             if (productAndAmount[0].equalsIgnoreCase("card")) {
-                cardNumber = Long.parseLong(productAndAmount[1]);
+                productInfo.getDiscountCard().setNumber(Long.parseLong(productAndAmount[1]));
+                break;
             } else {
-                productIds.add(Long.parseLong(productAndAmount[0]));
-                productAmount.add(Integer.parseInt(productAndAmount[1]));
+                productInfo.getProductIds().add(Long.parseLong(productAndAmount[0]));
+                productInfo.getProductAmount().add(Integer.parseInt(productAndAmount[1]));
             }
         }
-        return DiscountCard.builder()
-                .number(cardNumber)
-                .build();
     }
 }
