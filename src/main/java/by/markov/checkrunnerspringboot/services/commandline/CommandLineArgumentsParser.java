@@ -16,7 +16,7 @@ public class CommandLineArgumentsParser {
 
     public ProductInfo parseData(String[] args) {
         if (checkInputFormat(args)) {
-            parseCommandLineArgumentsAndDelegateCreateOrder(args);
+            parseCommandLineArguments(args);
         }
         return productInfo;
     }
@@ -34,7 +34,7 @@ public class CommandLineArgumentsParser {
         return true;
     }
 
-    public void parseCommandLineArgumentsAndDelegateCreateOrder(String[] args) {
+    public void parseCommandLineArguments(String[] args) {
         for (String str : args) {
             String[] productAndAmount = str.split("-");
             if (productAndAmount[0].equalsIgnoreCase("card")) {

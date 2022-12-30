@@ -30,7 +30,7 @@ public class FileCheckPrinter implements CheckPrinter {
         return file;
     }
 
-    private void writeCheckInFile(Check check, File file) throws IOException {
+    public void writeCheckInFile(Check check, File file) throws IOException {
         try (FileWriter fileWriter = new FileWriter(file, false)) {
             fileWriter.append(String.format("%25s%n%29s%n%25s%n", CheckPrinter.DEFAULT_SUPERMARKET_NAME,
                     CheckPrinter.DEFAULT_SUPERMARKET_ADDRESS,

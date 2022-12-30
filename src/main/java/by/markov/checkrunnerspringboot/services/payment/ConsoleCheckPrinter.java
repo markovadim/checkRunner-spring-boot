@@ -15,13 +15,13 @@ public class ConsoleCheckPrinter implements CheckPrinter {
         printTotalSumAndSumToPay(check);
     }
 
-    private void printMarketData() {
+    public void printMarketData() {
         System.out.printf("%25s%n%29s%n%25s%n", CheckPrinter.DEFAULT_SUPERMARKET_NAME,
                 CheckPrinter.DEFAULT_SUPERMARKET_ADDRESS,
                 CheckPrinter.DEFAULT_SUPERMARKET_PHONE);
     }
 
-    private void printCashierInfoAndDate(Check check) {
+    public void printCashierInfoAndDate(Check check) {
         System.out.printf("%-25sDATE:%1td/%tm/%ty%n%35tH:%tM\n", "CASHIER#" + (CheckPrinter.CASHIER_ID_BOTTOM_BORDER + Math.random() * CheckPrinter.CASHIER_ID_TOP_BORDER),
                 check.getDateTime(),
                 check.getDateTime(),
@@ -30,7 +30,7 @@ public class ConsoleCheckPrinter implements CheckPrinter {
                 check.getDateTime());
     }
 
-    private void printOrder(Check check) {
+    public void printOrder(Check check) {
         System.out.printf(CheckPrinter.TABLE_TOP_BORDER + "%n%-7s%10s%10s%10s%n%n", "QTY", "DESCRIPTION", "PRICE", "TOTAL");
         int currentProductAmount;
         for (Product product : check.getOrder().getShopBasket().keySet()) {
@@ -42,7 +42,7 @@ public class ConsoleCheckPrinter implements CheckPrinter {
         System.out.println(CheckPrinter.TABLE_BOTTOM_BORDER);
     }
 
-    private void printTotalSumAndSumToPay(Check check) {
+    public void printTotalSumAndSumToPay(Check check) {
         System.out.printf("%-25s%13.1f%n", "TAXABLE TOT.: $", check.getOrder().getTaxable());
         System.out.printf("%-25s%13.1f%n", "VAT10%: $", check.getOrder().getDiscount());
         System.out.printf("%-25s%13.1f%n", "TOTAL: $", check.getOrder().getSumToPay());

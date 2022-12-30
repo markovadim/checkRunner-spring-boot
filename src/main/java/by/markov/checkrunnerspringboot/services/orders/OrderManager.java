@@ -49,7 +49,7 @@ public class OrderManager {
         return sumWithoutDiscount;
     }
 
-    private boolean checkDiscountCard(DiscountCard discountCard) {
+    public boolean checkDiscountCard(DiscountCard discountCard) {
         return discountCardService.findByNumber(discountCard.getNumber()) != null;
     }
 
@@ -65,7 +65,7 @@ public class OrderManager {
         return sumToPay;
     }
 
-    private Order buildOrder(double taxable, double sumToPay) {
+    public Order buildOrder(double taxable, double sumToPay) {
         return Order.builder()
                 .shopBasket(shopBasket)
                 .discountCard(productInfo.getDiscountCard())
