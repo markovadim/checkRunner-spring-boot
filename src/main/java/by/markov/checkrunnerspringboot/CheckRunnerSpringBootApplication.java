@@ -26,10 +26,11 @@ public class CheckRunnerSpringBootApplication implements CommandLineRunner {
 
     @Override
     public void run(String[] args) {
-        /* toDo add check by empty args */
-        ProductInfo productInfo = commandLineArgumentsParser.parseData(args);
-        Order order = orderManager.createOrder(productInfo);
-        Check check = checkManager.createCheck(order);
-        checkPrinter.printCheck(check);
+        if (args.length != 0) {
+            ProductInfo productInfo = commandLineArgumentsParser.parseData(args);
+            Order order = orderManager.createOrder(productInfo);
+            Check check = checkManager.createCheck(order);
+            checkPrinter.printCheck(check);
+        }
     }
 }
