@@ -42,11 +42,11 @@ public class OrderManager {
     }
 
     public double getOrderSumWithoutDiscount(Map<Product, Integer> shopBasket) {
-        double sumWithoutDiscount = 0.0;
-        for (Map.Entry<Product, Integer> entry : shopBasket.entrySet()) {
-            sumWithoutDiscount += entry.getKey().getPrice() * entry.getValue();
-        }
-        return sumWithoutDiscount;
+        return shopBasket.entrySet()
+                .stream()
+                .mapToDouble(p -> p.getKey().getPrice() * p.getValue())
+                .reduce(Double::sum)
+                .orElseThrow();
     }
 
     public boolean checkDiscountCard(DiscountCard discountCard) {
