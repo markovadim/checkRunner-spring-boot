@@ -26,4 +26,10 @@ _______
 [comment]: <> (![image]&#40;https://user-images.githubusercontent.com/86801437/208313537-2eb0b5e3-1720-4b12-b0ae-90c9bed978aa.png&#41;)
 
 #### Docker image:
-    docker pull 200605030904/checkrunner
+    docker pull 200605030904/checkrunner  
+
+### Cache  
+***Examples LRU/LFU cache implementations in package /cache.***  
+***Used nested nodes.***  
+***Used aspect for checking entity in cache with custom annotation,
+unit testing of operations for work with cache, and base descriptions by javadoc***
