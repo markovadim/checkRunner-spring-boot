@@ -1,17 +1,12 @@
           SUPERMARKET 123
     12, MILKYWAY Galaxy/Earth
         Tel :123-456-7890
-CASHIER#9503             DATE:18/12/22
-                                 22:17
+CASHIER#3238             DATE:22/02/23
+                                 01:43
 ______________________________________
 QTY    DESCRIPTION     PRICE     TOTAL
 
-7         Lemon          3,4      23,8
-5         Water          3,1      15,5
-4         Cheese          6,3      25,4
-6         Rolls          2,1      12,7
-7         Chicken          9,3      65,3
 ======================================
-TAXABLE TOT.: $                  142,7
-VAT10%: $                         10,2
-TOTAL: $                         132,5
+TAXABLE TOT.: $                    0,0
+VAT10%: $                          0,0
+TOTAL: $                           0,0

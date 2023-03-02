@@ -3,83 +3,131 @@ package by.markov.checkrunnerspringboot.services.orders;
 import by.markov.checkrunnerspringboot.entities.DiscountCard;
 import by.markov.checkrunnerspringboot.entities.Order;
 import by.markov.checkrunnerspringboot.entities.Product;
-import by.markov.checkrunnerspringboot.entities.ProductInfo;
-import by.markov.checkrunnerspringboot.repositories.DiscountCardRepository;
-import by.markov.checkrunnerspringboot.repositories.ProductRepository;
+import by.markov.checkrunnerspringboot.exceptions.DiscountCardNotFound;
+import by.markov.checkrunnerspringboot.exceptions.ProductNotFoundException;
 import by.markov.checkrunnerspringboot.services.discountcards.DiscountCardService;
 import by.markov.checkrunnerspringboot.services.products.ProductService;
-import org.junit.jupiter.api.BeforeEach;
+import by.markov.checkrunnerspringboot.util.MockUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
+import static by.markov.checkrunnerspringboot.util.TestData.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
 class OrderManagerTest {
 
     @Mock
-    private ProductRepository productRepository;
-    @Mock
-    private DiscountCardRepository discountCardRepository;
-    private Map<Product, Integer> shopBasket;
-    private ProductInfo productInfo;
     private ProductService productService;
+    @Mock
     private DiscountCardService discountCardService;
+
     private OrderManager orderManager;
 
-    @BeforeEach
-    void setUp() {
-        productInfo = new ProductInfo(
-                List.of(1L, 2L, 3L),
-                List.of(1, 2, 3),
-                new DiscountCard(0L, 1234)
-        );
-        shopBasket = Map.of(new Product(0L, "Meet", 13.0, false), 1,
-                new Product(1L, "Milk", 2.0, true), 12,
-                new Product(2L, "Sugar", 1.5, false), 1,
-                new Product(3L, "Lemon", 3.0, true), 7);
-        productService = new ProductService(productRepository);
-        discountCardService = new DiscountCardService(discountCardRepository);
-        orderManager = new OrderManager(productService, shopBasket, discountCardService, productInfo);
+    @Test
+    @DisplayName("Order building")
+    void checkCreateOrderShouldReturnNotNullOrder() {
+        orderManager = new OrderManager(productService, MockUtil.getEmptyShopBasket(), discountCardService, MockUtil.getProductInfo());
+        doReturn(MockUtil.getProducts().get(ZERO)).when(productService).findById(ID_EXAMPLE_ONE);
+        doReturn(MockUtil.getProducts().get(ONE)).when(productService).findById(ID_EXAMPLE_TWO);
+        doReturn(MockUtil.getProducts().get(TWO)).when(productService).findById(ID_EXAMPLE_THREE);
+
+        Order order = orderManager.createOrder(MockUtil.getProductInfo());
+
+        assertNotNull(order);
     }
 
+    @Test
+    @DisplayName("Shop basket creating")
+    void checkCreateShopBasketShouldReturnSizeOf3() {
+        Map<Product, Integer> shopBasket = MockUtil.getEmptyShopBasket();
+        orderManager = new OrderManager(productService, shopBasket, discountCardService, MockUtil.getProductInfo());
+        doReturn(MockUtil.getProducts().get(ZERO)).when(productService).findById(ID_EXAMPLE_ONE);
+        doReturn(MockUtil.getProducts().get(ONE)).when(productService).findById(ID_EXAMPLE_TWO);
+        doReturn(MockUtil.getProducts().get(TWO)).when(productService).findById(ID_EXAMPLE_THREE);
+
+        orderManager.createShopBasket(MockUtil.getProductInfo());
+        int actualSize = shopBasket.size();
+
+        assertEquals(EXPECTED_IDS_LIST_SIZE, actualSize);
+    }
 
     @Test
-    @DisplayName("Sum with discount")
-    void getOrderSumToPay() {
-        assertEquals(55, Math.round(orderManager.getOrderSumToPay(shopBasket)));
+    @DisplayName("Shop basket creating with exception")
+    void checkCreateShopBasketShouldThrowException() {
+        orderManager = new OrderManager(productService, MockUtil.getShopBasket(), discountCardService, MockUtil.getProductInfo());
+        doThrow(ProductNotFoundException.class).when(productService).findById(ID_EXAMPLE_ONE);
+
+        assertThrows(ProductNotFoundException.class, () -> orderManager.createShopBasket(MockUtil.getProductInfo()));
     }
 
     @Test
     @DisplayName("Sum without discount")
     void getOrderSumWithoutDiscount() {
-        assertEquals(59.5, orderManager.getOrderSumWithoutDiscount(shopBasket));
+        orderManager = new OrderManager(productService, MockUtil.getShopBasket(), discountCardService, MockUtil.getProductInfo());
+
+        double actual = orderManager.getOrderSumWithoutDiscount(MockUtil.getShopBasket());
+
+        assertEquals(EXPECTED_TAXABLE, actual);
     }
 
     @Test
-    void checkDiscountCard() {
-        Mockito.when(discountCardRepository.findByNumber(1234)).thenReturn(Optional.of(productInfo.getDiscountCard()));
+    @DisplayName("Check discount card by number")
+    void checkDiscountCardShouldReturnTrue() {
+        orderManager = new OrderManager(productService, MockUtil.getShopBasket(), discountCardService, MockUtil.getProductInfo());
 
-        assertTrue(orderManager.checkDiscountCard(productInfo.getDiscountCard()));
+        doReturn(MockUtil.getProductInfo().getDiscountCard()).when(discountCardService).findByNumber(DEFAULT_CARD_NUMBER);
+
+        assertTrue(orderManager.checkDiscountCard(MockUtil.getProductInfo().getDiscountCard()));
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {3322L, 3221L, 9099L})
+    @DisplayName("Discount card not found exception")
+    void checkDiscountCardShouldThrowException(long cardNumber) {
+        orderManager = new OrderManager(productService, MockUtil.getShopBasket(), discountCardService, MockUtil.getProductInfo());
+
+        doThrow(DiscountCardNotFound.class).when(discountCardService).findByNumber(cardNumber);
+
+        assertThrows(DiscountCardNotFound.class, () -> orderManager.checkDiscountCard(new DiscountCard(ID_EXAMPLE_ONE, cardNumber)));
     }
 
     @Test
+    @DisplayName("Sum with discount")
+    void getOrderSumToPay() {
+        orderManager = new OrderManager(productService, MockUtil.getShopBasket(), discountCardService, MockUtil.getProductInfo());
+
+        double actual = orderManager.getOrderSumToPay(MockUtil.getShopBasket());
+
+        assertEquals(EXPECTED_SUM_TO_PAY, actual);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+            "33.2, 32.2",
+            "542.2, 432.2",
+            "52.3, 12.2"
+    })
     @DisplayName("Order builder")
-    void buildOrder() {
-        Order order = orderManager.buildOrder(100.0, 90.0);
-        assertAll("order",
-                () -> assertEquals(productInfo.getDiscountCard(), order.getDiscountCard()),
-                () -> assertEquals(10.0, order.getDiscount()),
-                () -> assertEquals(4, order.getShopBasket().size())
+    void checkBuildOrderShouldReturnDiscountAndNotEmptyOrder(double taxable, double sumToPay) {
+        orderManager = new OrderManager(productService, MockUtil.getShopBasket(), discountCardService, MockUtil.getProductInfo());
+
+        Order order = orderManager.buildOrder(taxable, sumToPay);
+
+        assertAll(
+                () -> assertEquals(MockUtil.getProductInfo().getDiscountCard(), order.getDiscountCard()),
+                () -> assertEquals(taxable - sumToPay, order.getDiscount()),
+                () -> assertFalse(order.getShopBasket().isEmpty())
         );
     }
 }

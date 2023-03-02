@@ -2,38 +2,71 @@ package by.markov.checkrunnerspringboot.services.commandline;
 
 import by.markov.checkrunnerspringboot.entities.DiscountCard;
 import by.markov.checkrunnerspringboot.entities.ProductInfo;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static by.markov.checkrunnerspringboot.util.TestData.EXPECTED_IDS_LIST_SIZE;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@ExtendWith(MockitoExtension.class)
 class CommandLineArgumentsParserTest {
 
-    List<Long> productIds = new ArrayList<>();
-    List<Integer> productAmount = new ArrayList<>();
-    String[] args = new String[]{"1-1", "2-2", "4-6", "card-1111"};
-    String[] argsNotPattern = new String[]{"11", "2-2", "4-6w", "card1111"};
+    private List<Long> productIds;
+    private List<Integer> productAmount;
 
-    DiscountCard discountCard = new DiscountCard();
-    ProductInfo productInfo = new ProductInfo(productIds, productAmount, discountCard);
-    CommandLineArgumentsParser commandLineArgumentsParser = new CommandLineArgumentsParser(productInfo);
+    private DiscountCard discountCard;
+    private ProductInfo productInfo;
+    private CommandLineArgumentsParser commandLineArgumentsParser;
 
-    @Test
-    void parseNotCorrectData() {
-        commandLineArgumentsParser.parseData(argsNotPattern);
-
-        assertEquals(0, productInfo.getProductIds().size());
+    @BeforeEach
+    void setUp() {
+        productIds = new ArrayList<>();
+        productAmount = new ArrayList<>();
+        discountCard = new DiscountCard();
+        productInfo = new ProductInfo(productIds, productAmount, discountCard);
+        commandLineArgumentsParser = new CommandLineArgumentsParser(productInfo);
     }
 
     @Test
-    void parseCorrectData() {
-        commandLineArgumentsParser.parseData(args);
+    @DisplayName("Parsing correct input data")
+    void checkInputFormatShouldReturnTrue() {
+        String[] inputData = new String[]{"1-1", "2-2", "4-6", "card-1951"};
 
-        assertEquals(2, productInfo.getProductIds().get(1));
+        boolean actual = commandLineArgumentsParser.checkInputFormat(inputData);
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    @DisplayName("Parsing not correct input data")
+    void checkInputFormatShouldReturnFalse() {
+        String[] inputData = new String[]{"22", "3-1", "4-6w", "card-0611"};
+
+        boolean actual = commandLineArgumentsParser.checkInputFormat(inputData);
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    @DisplayName("Parsing data. Not empty ids list")
+    void checkParseCommandLineArgumentsShouldReturn3() {
+        String[] inputData = new String[]{"2-1", "3-2", "4-6", "card-1651"};
+
+        commandLineArgumentsParser.parseCommandLineArguments(inputData);
+        int actualSize = productInfo.getProductIds().size();
+
+        assertThat(actualSize).isEqualTo(EXPECTED_IDS_LIST_SIZE);
+    }
+
+    @Test
+    @DisplayName("Parsing data with Exception")
+    void checkParseCommandLineArgumentsShouldReturnException() {
+        String[] inputData = new String[]{"0-1", "2-2j", "4q-6", "card-1111"};
+
+        assertThrows(NumberFormatException.class, () -> commandLineArgumentsParser.parseCommandLineArguments(inputData));
     }
 }

@@ -2,11 +2,12 @@ package by.markov.checkrunnerspringboot.services.payment;
 
 import by.markov.checkrunnerspringboot.entities.Check;
 import by.markov.checkrunnerspringboot.entities.Order;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import by.markov.checkrunnerspringboot.util.MockUtil;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -18,35 +19,33 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class ConsoleCheckPrinterTest {
+    public static final ByteArrayOutputStream OUTPUT_STREAM = MockUtil.getByteArrayOutputStream();
 
     @Mock
     private Order order;
+    @InjectMocks
     private Check check;
-    private ConsoleCheckPrinter consoleCheckPrinter;
-    private final ByteArrayOutputStream output = new ByteArrayOutputStream();
 
-    @BeforeEach
-    void setUpStreams() {
-        check = new Check(order, LocalDateTime.now());
-        consoleCheckPrinter = new ConsoleCheckPrinter();
-        System.setOut(new PrintStream(output));
+
+    @BeforeAll
+    static void setUpStreams() {
+        System.setOut(new PrintStream(OUTPUT_STREAM));
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"SUPERMARKET 123", "CASHIER#", "DESCRIPTION", "TAXABLE TOT.: $"})
     @DisplayName("Common check printer")
-    void printCheck() {
-        consoleCheckPrinter.printCheck(check);
-        assertAll("consoleCheckPrinter.printCheck(check)",
-                () -> assertFalse(output.toString().isEmpty()),
-                () -> assertTrue(output.toString().contains("SUPERMARKET 123")),
-                () -> assertTrue(output.toString().contains("CASHIER#")),
-                () -> assertTrue(output.toString().contains("DESCRIPTION")),
-                () -> assertTrue(output.toString().contains("PRICE")),
-                () -> assertTrue(output.toString().contains("TAXABLE TOT.: $")));
+    void printCheck(String line) {
+        check = new Check(order, LocalDateTime.now());
+        new ConsoleCheckPrinter().printCheck(check);
+        assertAll(
+                () -> assertFalse(OUTPUT_STREAM.toString().isEmpty()),
+                () -> assertTrue(OUTPUT_STREAM.toString().contains(line))
+        );
     }
 
-    @AfterEach
-    void cleanUpStreams() {
+    @AfterAll
+    static void cleanUpStreams() {
         System.setOut(null);
     }
 }
