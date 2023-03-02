@@ -3,6 +3,8 @@ package by.markov.checkrunnerspringboot.util;
 import by.markov.checkrunnerspringboot.entities.DiscountCard;
 import by.markov.checkrunnerspringboot.entities.Product;
 import by.markov.checkrunnerspringboot.entities.ProductInfo;
+import by.markov.checkrunnerspringboot.mapping.ProductMapper;
+import org.modelmapper.ModelMapper;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.file.Path;
@@ -33,6 +35,10 @@ public class MockUtil {
                 new DiscountCard(1, 2222),
                 new DiscountCard(2, 3333)
         );
+    }
+
+    public static ProductMapper getMapper() {
+        return new ProductMapper(new ModelMapper());
     }
 
     public static ProductInfo getProductInfo() {

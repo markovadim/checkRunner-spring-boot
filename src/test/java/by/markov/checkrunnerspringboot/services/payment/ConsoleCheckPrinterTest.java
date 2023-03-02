@@ -22,9 +22,9 @@ class ConsoleCheckPrinterTest {
     public static final ByteArrayOutputStream OUTPUT_STREAM = MockUtil.getByteArrayOutputStream();
 
     @Mock
-    public Order order;
+    private Order order;
     @InjectMocks
-    public Check check;
+    private Check check;
 
 
     @BeforeAll

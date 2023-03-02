@@ -1,51 +1,56 @@
 package by.markov.checkrunnerspringboot.services.products;
 
-import by.markov.checkrunnerspringboot.entities.Product;
 import by.markov.checkrunnerspringboot.exceptions.ProductNotFoundException;
 import by.markov.checkrunnerspringboot.repositories.ProductRepository;
 import by.markov.checkrunnerspringboot.util.MockUtil;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static by.markov.checkrunnerspringboot.util.TestData.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
 
     @Mock
-    public ProductRepository productRepository;
+    private ProductRepository productRepository;
     @InjectMocks
-    public ProductService productService;
+    private ProductService productService;
 
     @Test
     @DisplayName("Get product price")
     void checkFindByIdShouldReturnRightPrice() {
-        when(productRepository.findById(1L)).thenReturn(Optional.ofNullable(MockUtil.getProducts().get(1)));
+        doReturn(Optional.of(MockUtil.getProducts().get(ONE))).when(productRepository).findById(ID_EXAMPLE_ONE);
 
-        assertEquals(1.17, productService.findById(1L).getPrice());
+        double actualPrice = productService.findById(ID_EXAMPLE_ONE).getPrice();
+
+        assertEquals(LEMON_PRICE, actualPrice);
     }
 
     @Test
     @DisplayName("Find with exception")
     void checkFindByIdShouldThrowException() {
-        when(productRepository.findById(2L)).thenThrow(ProductNotFoundException.class);
+        doThrow(ProductNotFoundException.class).when(productRepository).findById(ID_EXAMPLE_TWO);
 
-        assertThrows(ProductNotFoundException.class, () -> productService.findById(2L));
+        assertThrows(ProductNotFoundException.class, () -> productService.findById(ID_EXAMPLE_TWO));
     }
 
 
     @Test
     @DisplayName("Find all products")
     void checkFindByIdShouldReturnSize() {
-        when(productRepository.findAll()).thenReturn(MockUtil.getProducts());
+        doReturn(MockUtil.getProducts()).when(productRepository).findAll();
 
         int actual = productService.findAll().size();
 
-        assertEquals(6, actual);
+        assertEquals(EXPECTED_SIZE, actual);
     }
 }

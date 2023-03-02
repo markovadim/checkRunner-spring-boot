@@ -14,29 +14,31 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
+
+import static by.markov.checkrunnerspringboot.util.TestData.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
 class DiscountCardServiceTest {
 
     @Mock
-    public DiscountCardRepository discountCardRepository;
+    private DiscountCardRepository discountCardRepository;
     @InjectMocks
-    public DiscountCardService discountCardService;
+    private DiscountCardService discountCardService;
 
     @Captor
-    public ArgumentCaptor<Long> captor;
+    private ArgumentCaptor<Long> captor;
 
     @Test
     @DisplayName("Find discount card without exception")
     void checkFindByNumberShouldReturnId0() {
-        when(discountCardRepository.findByNumber(1111)).thenReturn(java.util.Optional.ofNullable(MockUtil.getCards().get(0)));
+        doReturn(Optional.of(MockUtil.getCards().get(ZERO))).when(discountCardRepository).findByNumber(MOCK_ID);
 
-        assertEquals(0, discountCardService.findByNumber(1111).getId());
+        assertEquals(ZERO, discountCardService.findByNumber(MOCK_ID).getId());
     }
 
     @ParameterizedTest
@@ -49,11 +51,11 @@ class DiscountCardServiceTest {
     @Test
     @DisplayName("Using Argument Captor")
     void checkFindByIdWithUsingArgumentCaptorShouldReturnRightNumber() {
-        when(discountCardRepository.findByNumber(1111)).thenReturn(java.util.Optional.ofNullable(MockUtil.getCards().get(0)));
+        doReturn(Optional.of(MockUtil.getCards().get(ZERO))).when(discountCardRepository).findByNumber(MOCK_ID);
 
-        discountCardService.findByNumber(1111);
+        discountCardService.findByNumber(MOCK_ID);
         verify(discountCardRepository).findByNumber(captor.capture());
 
-        assertEquals(1111, captor.getValue());
+        assertEquals(MOCK_ID, captor.getValue());
     }
 }

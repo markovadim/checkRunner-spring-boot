@@ -2,27 +2,25 @@ package by.markov.checkrunnerspringboot.services.commandline;
 
 import by.markov.checkrunnerspringboot.entities.DiscountCard;
 import by.markov.checkrunnerspringboot.entities.ProductInfo;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static by.markov.checkrunnerspringboot.util.TestData.EXPECTED_IDS_LIST_SIZE;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@ExtendWith(MockitoExtension.class)
 class CommandLineArgumentsParserTest {
 
-    public List<Long> productIds;
-    public List<Integer> productAmount;
+    private List<Long> productIds;
+    private List<Integer> productAmount;
 
-    public DiscountCard discountCard;
-    public ProductInfo productInfo;
-    public CommandLineArgumentsParser commandLineArgumentsParser;
+    private DiscountCard discountCard;
+    private ProductInfo productInfo;
+    private CommandLineArgumentsParser commandLineArgumentsParser;
 
     @BeforeEach
     void setUp() {
@@ -33,22 +31,6 @@ class CommandLineArgumentsParserTest {
         commandLineArgumentsParser = new CommandLineArgumentsParser(productInfo);
     }
 
-    @AfterEach
-    void cleanLists() {
-        productIds.clear();
-        productAmount.clear();
-    }
-
-    @Test
-    @DisplayName("Adding IDs to the list")
-    void checkParseDataShouldReturnListSizeOf3() {
-        String[] args = new String[]{"1-1", "2-2", "4-6", "card-1111"};
-
-        commandLineArgumentsParser.parseData(args);
-
-        assertEquals(3, productInfo.getProductIds().size());
-    }
-
     @Test
     @DisplayName("Parsing correct input data")
     void checkInputFormatShouldReturnTrue() {
@@ -56,7 +38,7 @@ class CommandLineArgumentsParserTest {
 
         boolean actual = commandLineArgumentsParser.checkInputFormat(inputData);
 
-        assertTrue(actual);
+        assertThat(actual).isTrue();
     }
 
     @Test
@@ -66,7 +48,7 @@ class CommandLineArgumentsParserTest {
 
         boolean actual = commandLineArgumentsParser.checkInputFormat(inputData);
 
-        assertFalse(actual);
+        assertThat(actual).isFalse();
     }
 
     @Test
@@ -75,8 +57,9 @@ class CommandLineArgumentsParserTest {
         String[] inputData = new String[]{"2-1", "3-2", "4-6", "card-1651"};
 
         commandLineArgumentsParser.parseCommandLineArguments(inputData);
+        int actualSize = productInfo.getProductIds().size();
 
-        assertEquals(3, productInfo.getProductIds().size());
+        assertThat(actualSize).isEqualTo(EXPECTED_IDS_LIST_SIZE);
     }
 
     @Test

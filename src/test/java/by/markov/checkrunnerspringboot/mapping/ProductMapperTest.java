@@ -1,40 +1,27 @@
 package by.markov.checkrunnerspringboot.mapping;
 
 import by.markov.checkrunnerspringboot.dto.ProductDto;
-import by.markov.checkrunnerspringboot.entities.Product;
-import org.junit.jupiter.api.BeforeAll;
+import by.markov.checkrunnerspringboot.util.MockUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
 
-import java.util.Arrays;
 import java.util.List;
 
+import static by.markov.checkrunnerspringboot.util.TestData.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ProductMapperTest {
 
-    public static ModelMapper modelMapper;
-    public static ProductMapper productMapper;
-    public static List<Product> product;
-
-    @BeforeAll
-    static void setUp() {
-        modelMapper = new ModelMapper();
-        productMapper = new ProductMapper(modelMapper);
-        product = List.of(new Product(1, "fish", 34.12, false));
-    }
-
     @Test
     @DisplayName("Check dto mapper")
     void checkGetDtoListShouldReturnList() {
-        List<ProductDto> productDtoList = productMapper.getDtoList(product);
+        List<ProductDto> productDtoList = MockUtil.getMapper().getDtoList(MockUtil.getProducts());
 
         assertAll(
-                () -> assertEquals(1, productDtoList.size()),
-                () -> assertEquals(product.get(0).getProductName(), productDtoList.get(0).getProductName()),
-                () -> assertEquals(34.12, productDtoList.get(0).getPrice()),
-                () -> assertThrows(IndexOutOfBoundsException.class, () -> productDtoList.get(1))
+                () -> assertEquals(EXPECTED_SIZE, productDtoList.size()),
+                () -> assertEquals(MockUtil.getProducts().get(ZERO).getProductName(), productDtoList.get(ZERO).getProductName()),
+                () -> assertEquals(EXPECTED_PRICE, productDtoList.get(ZERO).getPrice()),
+                () -> assertThrows(IndexOutOfBoundsException.class, () -> productDtoList.get(NOT_CORRECT_ID))
         );
     }
 }
